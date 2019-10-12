@@ -8,6 +8,10 @@
       tags:
         - prep
 
+    - import_tasks: "./tasks/ssl.yml"
+      tags:
+        - ssl
+
     - import_tasks: "./tasks/mysql.yml"
       tags:
         - mysql
@@ -15,7 +19,3 @@
     - import_tasks: "./tasks/ufw.yml"
       tags:
         - ufw
-
-    - import_tasks: "./tasks/ssl.yml"
-      tags:
-        - ssl

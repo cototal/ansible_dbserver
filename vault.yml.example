@@ -1,0 +1,10 @@
+---
+server_name: example.com
+host_ip: "192.168.0.100"
+ansible_become_pass: secret1
+mysql_root_pass: secret2
+mysql_username: user3
+mysql_user_pass: secret3
+other_ips:
+  - 1.2.3.4
+  - 5.6.7.8

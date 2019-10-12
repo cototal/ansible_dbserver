@@ -6,6 +6,12 @@
     name:
       - mysql-server
 
+- name: Check for SSL config (breaks some setup tasks that should already be done)
+  become: true
+  stat:
+    path: /etc/mysql/mysql.conf.d/mysql_ssl.cnf
+  register: mysql_ssl_conf
+
 #region mysql_secure_installation
 - name: Check if root password is set
   command: "mysql -u root -p'{{ mysql_root_pass }}' -e 'SELECT 1'"
@@ -30,6 +36,7 @@
     login_password: "{{ mysql_root_pass }}"
     name: test
     state: absent
+  when: not mysql_ssl_conf.stat.exists
 
 - name: Remove anonymous users
   mysql_user:
@@ -38,6 +45,7 @@
     name: ""
     state: absent
     host_all: yes
+  when: not mysql_ssl_conf.stat.exists
 
 - name: Remove remote root access
   command: "mysql -u root -p{{ mysql_root_pass }} -e \"DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');\""
@@ -66,6 +74,15 @@
       early-plugin-load=keyring_file.so
     dest: /etc/mysql/mysql.conf.d/mysql_keyring_setup.cnf
 
+# files are in default location, so they do not need to be specified
+- name: Configure SSL for MySQL server
+  become: true
+  copy:
+    content: |
+      [mysqld]
+      require_secure_transport=ON
+    dest: /etc/mysql/mysql.conf.d/mysql_ssl.cnf
+
 - name: Prepare remote user
   mysql_user:
     login_user: root
@@ -78,6 +95,7 @@
   with_items:
     - localhost
     - "%"
+  when: not mysql_ssl_conf.stat.exists
 
 - name: Open mysql for remote connections
   become: true
