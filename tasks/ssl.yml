@@ -1,0 +1,36 @@
+---
+- name: Copy cert config to server
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/certs/{{ item.src }}"
+    dest: "/var/lib/mysql/{{ item.dest }}"
+  with_items:
+    - { src: myCA.pem, dest: ca.pem }
+    - { src: "{{ server_name }}.crt", dest: client-cert.pem }
+    - { src: "{{ server_name }}.key", dest: client-key.pem }
+
+- name: Change ownership of MySQL cert files
+  become: true
+  file:
+    owner: mysql
+    group: mysql
+    path: "/var/lib/mysql/{{ item }}"
+  with_items:
+    - ca.pem
+    - client-cert.pem
+    - client-key.pem
+
+# files are in default location, so they do not need to be specified
+- name: Configure SSL for MySQL server
+  become: true
+  copy:
+    content: |
+      [mysqld]
+      require_secure_transport=ON
+    dest: /etc/mysql/mysql.conf.d/mysql_ssl.cnf
+
+- name: Restart MySQL service
+  become: true
+  service:
+    name: mysql
+    state: restarted

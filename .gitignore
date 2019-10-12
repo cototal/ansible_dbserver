@@ -2,3 +2,5 @@
 /vault.yml
 /tmp
 /fetched
+/certs/*
+!/certs/.gitkeep

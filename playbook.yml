@@ -4,7 +4,18 @@
     - vars.yml
     - vault.yml
   tasks:
-    - name: Set timezone to CST
-      become: true
-      timezone:
-        name: America/Chicago
+    - import_tasks: "./tasks/prep.yml"
+      tags:
+        - prep
+
+    - import_tasks: "./tasks/mysql.yml"
+      tags:
+        - mysql
+
+    - import_tasks: "./tasks/ufw.yml"
+      tags:
+        - ufw
+
+    - import_tasks: "./tasks/ssl.yml"
+      tags:
+        - ssl

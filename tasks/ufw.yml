@@ -1,0 +1,35 @@
+---
+- name: Reset UFW
+  become: true
+  ufw:
+    state: reset
+
+- name: Deny incoming by default
+  become: true
+  ufw:
+    direction: incoming
+    policy: deny
+
+- name: Allow in from current host
+  become: true
+  ufw:
+    rule: allow
+    src: "{{ host_ip }}"
+
+- name: Allow other servers
+  become: true
+  ufw:
+    rule: allow
+    src: "{{ item }}"
+    port: "3306"
+    proto: tcp
+  with_items: "{{ other_ips }}"
+
+- name: Enable UFW
+  become: true
+  ufw:
+    state: enabled
+
+- name: Tell user to reboot
+  debug:
+    msg: "*** Reboot the server for UFW to be activated. ***"
