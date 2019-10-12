@@ -1,0 +1,10 @@
+---
+- hosts: dbservers
+  vars_files:
+    - vars.yml
+    - vault.yml
+  tasks:
+    - name: Set timezone to CST
+      become: true
+      timezone:
+        name: America/Chicago
